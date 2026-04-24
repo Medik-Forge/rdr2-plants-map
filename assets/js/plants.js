@@ -1,10 +1,27 @@
+const CUSTOM_VISIBLE_PLANTS = [
+  'milkweed',
+  'oleander',
+  'burdock_root',
+  'creeping_thyme',
+  'harrietum',
+  'lobelia'
+];
+
 class Plants {
   constructor(preliminary) {
     Object.assign(this, preliminary);
 
+    this.isCustomVisible = CUSTOM_VISIBLE_PLANTS.includes(this.key);
+
     this.element = document.createElement('div');
     this.element.className = 'collectible-wrapper';
-    Object.assign(this.element.dataset, { help: 'item', type: this.key, tippyContent: Language.get(`map.plants.${this.key}.name`) });
+
+    Object.assign(this.element.dataset, {
+      help: 'item',
+      type: this.key,
+      tippyContent: Language.get(`map.plants.${this.key}.name`)
+    });
+
     this.element.innerHTML = `
       <img class="collectible-icon" src="./assets/images/icons/game/${this.key}.png">
       <span class="collectible-text ${!this.onMap ? 'disabled' : ''}">
@@ -16,13 +33,20 @@ class Plants {
       this.onMap = !this.onMap;
       setTimeout(() => PlantsCollection.layer.redraw(), 40);
     });
+
     Language.translateDom(this.element);
 
-    PlantsCollection.context.appendChild(this.element);
+    if (this.isCustomVisible) {
+      PlantsCollection.context.appendChild(this.element);
+    }
 
     this.reinitMarker();
 
-    if (this.onMap) {
+    if (!this.isCustomVisible && this.onMap) {
+      this.onMap = false;
+    }
+
+    if (this.isCustomVisible && this.onMap) {
       this.onMap = this.onMap;
     }
   }
@@ -30,6 +54,7 @@ class Plants {
   reinitMarker() {
     this.markers = [];
     const markerSize = Settings.markerSize;
+
     this.locations.forEach((_marker) => {
       const tempMarker = L.marker([_marker.x, _marker.y], {
         opacity: Settings.markerOpacity,
@@ -43,23 +68,32 @@ class Plants {
           shadowAnchor: [10 * markerSize, 10 * markerSize],
         }),
       });
-      tempMarker.bindPopup(this.popupContent.bind(this, _marker), { minWidth: 300, maxWidth: 400 });
+
+      tempMarker.bindPopup(this.popupContent.bind(this, _marker), {
+        minWidth: 300,
+        maxWidth: 400
+      });
+
       this.markers.push(tempMarker);
     });
   }
 
   popupContent(_marker) {
-    const description = Language.get('map.plants.desc').replace(/{plant}/, Language.get(`map.plants.${this.key}.name`).toLowerCase());
+    const description = Language.get('map.plants.desc').replace(
+      /{plant}/,
+      Language.get(`map.plants.${this.key}.name`).toLowerCase()
+    );
 
     const popup = document.createElement('div');
     popup.innerHTML = `
-          <h1 data-text="map.plants.${this.key}.name"></h1>
-          <span class="marker-content-wrapper">
-            <p>${description}</p>
-          </span>
-          <button class="btn btn-info remove-button full-popup-width" data-text="map.remove"></button>
-          <small>Latitude: ${_marker.x} / Longitude: ${_marker.y}</small>
+      <h1 data-text="map.plants.${this.key}.name"></h1>
+      <span class="marker-content-wrapper">
+        <p>${description}</p>
+      </span>
+      <button class="btn btn-info remove-button full-popup-width" data-text="map.remove"></button>
+      <small>Latitude: ${_marker.x} / Longitude: ${_marker.y}</small>
     `;
+
     Language.translateDom(popup);
 
     if (!Settings.isDebugEnabled) popup.querySelector('small').style.display = 'none';
@@ -70,24 +104,44 @@ class Plants {
 
   set onMap(state) {
     if (!MapBase.isPreviewMode && !PlantsCollection.onMap) return false;
+
     if (state) {
       if (!PlantsCollection.enabledCategories.includes(this.key)) {
         PlantsCollection.markers = PlantsCollection.markers.concat(this.markers);
         PlantsCollection.enabledCategories.push(this.key);
       }
+
       PlantsCollection.layer.clearLayers();
-      if (PlantsCollection.markers.length > 0) PlantsCollection.layer.addLayers(PlantsCollection.markers);
-      if (!MapBase.isPreviewMode) localStorage.setItem(`rdo.${this.key}`, 'true');
-      this.element.querySelector('span').classList.remove('disabled');
+
+      if (PlantsCollection.markers.length > 0) {
+        PlantsCollection.layer.addLayers(PlantsCollection.markers);
+      }
+
+      if (!MapBase.isPreviewMode) {
+        localStorage.setItem(`rdo.${this.key}`, 'true');
+      }
+
+      if (this.element.parentElement) {
+        this.element.querySelector('span').classList.remove('disabled');
+      }
     } else {
       PlantsCollection.markers = PlantsCollection.markers.filter((el) => !this.markers.includes(el));
       PlantsCollection.enabledCategories = PlantsCollection.enabledCategories.filter((el) => el !== this.key);
 
       PlantsCollection.layer.clearLayers();
-      if (PlantsCollection.markers.length > 0) PlantsCollection.layer.addLayers(PlantsCollection.markers);
 
-      if (!MapBase.isPreviewMode) localStorage.removeItem(`rdo.${this.key}`);
-      this.element.querySelector('span').classList.add('disabled');
+      if (PlantsCollection.markers.length > 0) {
+        PlantsCollection.layer.addLayers(PlantsCollection.markers);
+      }
+
+      if (!MapBase.isPreviewMode) {
+        localStorage.removeItem(`rdo.${this.key}`);
+      }
+
+      if (this.element.parentElement) {
+        this.element.querySelector('span').classList.add('disabled');
+      }
+
       MapBase.map.closePopup();
     }
   }
@@ -104,7 +158,6 @@ class PlantsCollection {
     this.markers = [];
     this.quickParams = [];
 
-
     PlantsCollection.layer.addTo(MapBase.map);
 
     this.locations = [];
@@ -115,6 +168,7 @@ class PlantsCollection {
         this.locations.push(new Plants(item));
         this.quickParams.push(item.key);
       });
+
       console.info('%c[Plants] Loaded!', 'color: #bada55; background: #242424');
       setTimeout(() => PlantsCollection.layer.redraw(), 40);
       Menu.reorderMenu(this.context);
@@ -127,9 +181,12 @@ class PlantsCollection {
     } else {
       this.layer.remove();
     }
+
     this.context.classList.toggle('disabled', !state);
 
-    if (!MapBase.isPreviewMode) localStorage.setItem('rdo.plants', JSON.stringify(state));
+    if (!MapBase.isPreviewMode) {
+      localStorage.setItem('rdo.plants', JSON.stringify(state));
+    }
 
     PlantsCollection.locations.forEach((_plants) => {
       if (_plants.onMap) _plants.onMap = state;
@@ -151,11 +208,19 @@ class PlantsCollection {
 
   static refresh() {
     this.markers = [];
+
     this.locations.forEach((plants) => {
       plants.reinitMarker();
-      if (plants.onMap) this.markers = this.markers.concat(plants.markers);
+
+      if (plants.onMap) {
+        this.markers = this.markers.concat(plants.markers);
+      }
     });
+
     this.layer.clearLayers();
-    if (this.markers.length > 0) this.layer.addLayers(this.markers);
+
+    if (this.markers.length > 0) {
+      this.layer.addLayers(this.markers);
+    }
   }
 }
