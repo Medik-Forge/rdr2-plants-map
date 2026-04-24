@@ -2892,3 +2892,57 @@ button.reload-nazar {
     display: block;
   }
 }
+.custom-plant-menu {
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.96);
+  color: #f5e6c8;
+  padding: 18px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+.custom-plant-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: 24px;
+  border: 2px solid #f5e6c8;
+  padding: 14px;
+}
+
+.custom-plant-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.custom-plant-actions button,
+.custom-plant-button {
+  width: 100%;
+  background: #111;
+  color: #f5e6c8;
+  border: 1px solid #c77b32;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.custom-plant-actions button:hover,
+.custom-plant-button:hover {
+  border-color: orange;
+  color: orange;
+}
+
+.custom-plant-section-title {
+  color: orange;
+  font-size: 18px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.custom-plant-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
