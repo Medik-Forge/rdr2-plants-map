@@ -1,30 +1,39 @@
-document.addEventListener('DOMContentLoaded', () => {
-
-  // ❌ ховаємо ВСІ секції крім plants
+function cleanMenu() {
+  // 1. Прибрати всі блоки крім рослин
   document.querySelectorAll('.menu-hidden').forEach(el => {
     if (el.dataset.type !== 'plants') {
       el.style.display = 'none';
     }
   });
 
-  // ❌ ховаємо ВСІ текстові категорії (Животные, преступники і т.д.)
-  document.querySelectorAll('.menu-option').forEach(el => {
-    el.style.display = 'none';
-  });
+  // 2. Прибрати ВСІ зайві пункти (животные, события, метки і тд)
+  document.querySelectorAll('.menu-option, .menu-toggle, .settings-option').forEach(el => {
+    const text = el.innerText.toLowerCase();
 
-  // ❌ ховаємо нижні блоки (події)
-  document.querySelectorAll('.links-container').forEach(el => {
-    el.style.display = 'none';
-  });
+    const allowed = [
+      'растения',
+      'harrietum',
+      'молочай',
+      'тимьян'
+    ];
 
-  // ❌ ховаємо підказку
-  document.querySelectorAll('.menu-help').forEach(el => {
-    el.style.display = 'none';
-  });
+    const isAllowed = allowed.some(word => text.includes(word));
 
-  // ❌ ховаємо рекламу
-  document.querySelectorAll('.menu-ad').forEach(el => {
-    el.style.display = 'none';
+    if (!isAllowed) {
+      el.style.display = 'none';
+    }
   });
+}
 
+// запускаємо один раз
+document.addEventListener('DOMContentLoaded', cleanMenu);
+
+// 🔥 головне — слідкуємо за динамікою
+const observer = new MutationObserver(() => {
+  cleanMenu();
+});
+
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
 });
