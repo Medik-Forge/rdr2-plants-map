@@ -1,39 +1,29 @@
-function cleanMenu() {
-  // 1. Прибрати всі блоки крім рослин
-  document.querySelectorAll('.menu-hidden').forEach(el => {
-    if (el.dataset.type !== 'plants') {
-      el.style.display = 'none';
-    }
-  });
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    // знайти ВСІ секції меню
+    document.querySelectorAll('.menu-hidden').forEach(section => {
+      const title = section.innerText.toLowerCase();
 
-  // 2. Прибрати ВСІ зайві пункти (животные, события, метки і тд)
-  document.querySelectorAll('.menu-option, .menu-toggle, .settings-option').forEach(el => {
-    const text = el.innerText.toLowerCase();
+      // залишаємо тільки "растения"
+      if (!title.includes('растения')) {
+        section.style.display = 'none';
+      }
+    });
 
-    const allowed = [
-      'растения',
-      'harrietum',
-      'молочай',
-      'тимьян'
-    ];
+    // ховаємо зайві кнопки
+    document.querySelectorAll('.menu-option').forEach(el => {
+      const text = el.innerText.toLowerCase();
 
-    const isAllowed = allowed.some(word => text.includes(word));
+      if (
+        text.includes('живот') ||
+        text.includes('преступ') ||
+        text.includes('событ') ||
+        text.includes('мисси') ||
+        text.includes('дополн')
+      ) {
+        el.style.display = 'none';
+      }
+    });
 
-    if (!isAllowed) {
-      el.style.display = 'none';
-    }
-  });
-}
-
-// запускаємо один раз
-document.addEventListener('DOMContentLoaded', cleanMenu);
-
-// 🔥 головне — слідкуємо за динамікою
-const observer = new MutationObserver(() => {
-  cleanMenu();
-});
-
-observer.observe(document.body, {
-  childList: true,
-  subtree: true
+  }, 1000); // чекаємо поки меню прогрузиться
 });
