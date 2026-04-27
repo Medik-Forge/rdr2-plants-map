@@ -71,9 +71,13 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function init() {
-  SettingProxy.addSetting(Settings, 'language', {
-    default: 'en',
-  });
+  SettingProxy.addSetting(Settings, 'language', { default: 'en' });
+
+  SettingProxy.addSetting(Settings, 'zoomSnap', { default: 0 });
+  SettingProxy.addSetting(Settings, 'markerSize', { default: 1 });
+  SettingProxy.addSetting(Settings, 'markerOpacity', { default: 1 });
+  SettingProxy.addSetting(Settings, 'isShadowsEnabled', { default: true });
+  SettingProxy.addSetting(Settings, 'isDebugEnabled', { default: false });
 
   MapBase.init();
 
