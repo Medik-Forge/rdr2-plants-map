@@ -45,12 +45,12 @@ class Plants {
     Object.assign(this, preliminary);
 
     this.markers = [];
-    this.visible = true;
+    this.visible = false;
 
     this.createMenuItem();
     this.reinitMarker();
 
-    this.onMap = true;
+    this.onMap = false;
   }
 
   createMenuItem() {
@@ -58,10 +58,10 @@ class Plants {
     if (!list) return;
 
     this.element = document.createElement('label');
-    this.element.className = 'plant-option';
+    this.element.className = 'plant-option disabled';
 
     this.element.innerHTML = `
-      <input type="checkbox" checked data-plant-key="${this.key}">
+      <input type="checkbox" data-plant-key="${this.key}">
       <img src="./assets/images/icons/game/${this.key}.png" alt="">
       <span>${getPlantName(this.key)}</span>
     `;
@@ -92,13 +92,21 @@ class Plants {
       const tempMarker = L.marker([_marker.x, _marker.y], {
         opacity: Settings.markerOpacity || 1,
         icon: L.divIcon({
-          iconUrl: `assets/images/markers/${this.key}.png`,
+          className: 'plant-map-marker',
+          html: `
+            <img
+              src="assets/images/markers/${this.key}.png"
+              class="plant-map-marker-image"
+              style="
+                width: ${35 * markerSize}px;
+                height: ${45 * markerSize}px;
+              "
+              alt=""
+            >
+          `,
           iconSize: [35 * markerSize, 45 * markerSize],
           iconAnchor: [17 * markerSize, 42 * markerSize],
           popupAnchor: [0, -28 * markerSize],
-          shadowUrl: Settings.isShadowsEnabled ? 'assets/images/markers-shadow.png' : '',
-          shadowSize: [35 * markerSize, 16 * markerSize],
-          shadowAnchor: [10 * markerSize, 10 * markerSize],
         }),
       });
 
@@ -128,9 +136,23 @@ class Plants {
     `;
 
     popup.querySelector('button').addEventListener('click', () => {
+      const marker = this.markers.find((item) => item.markerIndex === index);
+
+      if (marker && marker._icon) {
+        const markerImage = marker._icon.querySelector('.plant-map-marker-image');
+
+        if (markerImage) {
+          markerImage.style.filter = 'grayscale(1)';
+          markerImage.style.opacity = '0.45';
+        }
+      }
+
       localStorage.setItem(getCollectedKey(this.key, index), '1');
-      PlantsCollection.refresh();
-      MapBase.map.closePopup();
+
+      setTimeout(() => {
+        PlantsCollection.refresh();
+        MapBase.map.closePopup();
+      }, 500);
     });
 
     if (!Settings.isDebugEnabled) {
@@ -164,6 +186,7 @@ class Plants {
 
     if (this.element) {
       this.element.classList.toggle('disabled', !state);
+
       const checkbox = this.element.querySelector('input');
       if (checkbox) checkbox.checked = state;
     }
@@ -204,6 +227,7 @@ class PlantsCollection {
     const resetButton = document.getElementById('reset-collected');
     const selectAllButton = document.getElementById('select-all-plants');
     const clearAllButton = document.getElementById('clear-all-plants');
+    const searchInput = document.getElementById('plants-search');
 
     if (resetButton) {
       resetButton.addEventListener('click', () => {
@@ -219,19 +243,65 @@ class PlantsCollection {
 
     if (selectAllButton) {
       selectAllButton.addEventListener('click', () => {
-        PlantsCollection.locations.forEach((plant) => {
-          plant.onMap = true;
-        });
+        PlantsCollection.setAllPlantsVisible(true);
       });
     }
 
     if (clearAllButton) {
       clearAllButton.addEventListener('click', () => {
+        PlantsCollection.setAllPlantsVisible(false);
+      });
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        const query = searchInput.value.trim().toLowerCase();
+
         PlantsCollection.locations.forEach((plant) => {
-          plant.onMap = false;
+          if (!plant.element) return;
+
+          const plantName = getPlantName(plant.key).toLowerCase();
+          const plantKey = plant.key.toLowerCase();
+
+          const isVisibleInSearch =
+            plantName.includes(query) ||
+            plantKey.includes(query);
+
+          plant.element.style.display = isVisibleInSearch ? '' : 'none';
         });
       });
     }
+  }
+
+  static setAllPlantsVisible(state) {
+    this.markers = [];
+    this.enabledCategories = [];
+
+    this.locations.forEach((plant) => {
+      plant.visible = state;
+
+      if (plant.element) {
+        plant.element.classList.toggle('disabled', !state);
+
+        const checkbox = plant.element.querySelector('input');
+        if (checkbox) checkbox.checked = state;
+      }
+
+      if (state) {
+        this.markers = this.markers.concat(plant.markers);
+        this.enabledCategories.push(plant.key);
+      }
+    });
+
+    this.layer.clearLayers();
+
+    if (this.markers.length > 0) {
+      this.layer.addLayers(this.markers);
+    }
+
+    setTimeout(() => {
+      PlantsCollection.layer.redraw();
+    }, 40);
   }
 
   static set onMap(state) {
@@ -241,9 +311,7 @@ class PlantsCollection {
       this.layer.remove();
     }
 
-    PlantsCollection.locations.forEach((plant) => {
-      plant.onMap = state;
-    });
+    PlantsCollection.setAllPlantsVisible(state);
   }
 
   static get onMap() {
@@ -262,8 +330,22 @@ class PlantsCollection {
 
     this.locations.forEach((plant) => {
       const wasVisible = plant.visible;
+
       plant.reinitMarker();
-      plant.onMap = wasVisible;
+
+      plant.visible = wasVisible;
+
+      if (wasVisible) {
+        this.markers = this.markers.concat(plant.markers);
+        this.enabledCategories.push(plant.key);
+      }
+
+      if (plant.element) {
+        plant.element.classList.toggle('disabled', !wasVisible);
+
+        const checkbox = plant.element.querySelector('input');
+        if (checkbox) checkbox.checked = wasVisible;
+      }
     });
 
     this.layer.clearLayers();
