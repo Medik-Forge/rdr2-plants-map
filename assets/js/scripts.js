@@ -1,36 +1,16 @@
+// FIX щоб не було помилки redefine
 if (!Date.prototype.toISOUTCDateString) {
-  Object.defineProperty(Date.prototype, 'toISOUTCDateString', {
-    value: function () {
-      return this.toISOString().split('T')[0];
-    },
-  });
+  Date.prototype.toISOUTCDateString = function () {
+    return this.toISOString().split('T')[0];
+  };
 }
 
 if (!String.prototype.filename) {
-  Object.defineProperty(String.prototype, 'filename', {
-    value: function (extension) {
-      let s = this.replace(/\\/g, '/');
-      s = s.substring(s.lastIndexOf('/') + 1);
-      return extension ? s.replace(/[?#].+$/, '') : s.split('.')[0];
-    },
-  });
-}
-
-function getParameterByName(name, url) {
-  if (!url) url = window.location.href;
-  name = name.replace(/[\[\]]/g, '\\$&');
-
-  const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
-  const results = regex.exec(url);
-
-  if (!results) return null;
-  if (!results[2]) return '';
-
-  return decodeURIComponent(results[2].replace(/\+/g, ' '));
-}
-
-function isLocalHost() {
-  return location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  String.prototype.filename = function (extension) {
+    let s = this.replace(/\\/g, '/');
+    s = s.substring(s.lastIndexOf('/') + 1);
+    return extension ? s.replace(/[?#].+$/, '') : s.split('.')[0];
+  };
 }
 
 function changeCursor() {
@@ -38,32 +18,12 @@ function changeCursor() {
   if (map) map.style.cursor = 'grab';
 }
 
-const Discoverable = {
-  updateLayers() {},
-  onSettingsChanged() {},
-};
-
-const Overlay = {
-  onSettingsChanged() {},
-};
-
-const Legendary = {
-  quickParams: [],
-  animals: [],
-  onSettingsChanged() {},
-};
-
-const Menu = {
-  init() {},
-  reorderMenu() {},
-  updateTippy() {},
-  updateRangeTippy() {},
-  updateFancySelect() {},
-};
-
-const FME = {
-  update() {},
-};
+// заглушки
+const Discoverable = { updateLayers() {}, onSettingsChanged() {} };
+const Overlay = { onSettingsChanged() {} };
+const Legendary = { quickParams: [], animals: [], onSettingsChanged() {} };
+const Menu = { init() {}, reorderMenu() {}, updateTippy() {}, updateRangeTippy() {}, updateFancySelect() {} };
+const FME = { update() {} };
 
 document.addEventListener('DOMContentLoaded', function () {
   try {
@@ -75,21 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function init() {
-  const navLang = navigator.language;
-  const langCodesMap = {
-    'zh-CN': 'zh-Hans',
-    'zh-SG': 'zh-Hans',
-    'zh-HK': 'zh-Hant',
-    'zh-TW': 'zh-Hant',
-  };
-
-  const mappedLanguage = langCodesMap[navLang] || navLang;
-
-  SettingProxy.addSetting(Settings, 'language', {
-    default: Language.availableLanguages.includes(mappedLanguage)
-      ? mappedLanguage
-      : 'en',
-  });
+  SettingProxy.addSetting(Settings, 'language', { default: 'en' });
 
   MapBase.init();
 
@@ -101,6 +47,6 @@ function init() {
     .then(() => {
       Loader.resolveMapModelLoaded();
       window.loaded = true;
-      console.info('%c[Clean Map] Only plants loaded', 'color: #bada55; background: #242424');
+      console.info('[Clean Map] Plants loaded');
     });
 }
