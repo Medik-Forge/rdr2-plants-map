@@ -8,13 +8,141 @@
   <link rel="stylesheet" href="assets/css/leaflet.css">
   <link rel="stylesheet" href="assets/css/bootstrap.min.css">
   <link rel="stylesheet" href="assets/css/styles.css">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #map {
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #plants-panel {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 9999;
+      width: 320px;
+      max-height: calc(100vh - 24px);
+      overflow-y: auto;
+      background: rgba(34, 25, 18, 0.94);
+      border: 2px solid #b08a4a;
+      border-radius: 8px;
+      padding: 12px;
+      color: #f4e1b8;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+      font-family: Arial, sans-serif;
+    }
+
+    #plants-panel h2 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      text-align: center;
+      color: #ffd27a;
+    }
+
+    .plants-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .plants-actions button,
+    #reset-collected {
+      background: #8b5a2b;
+      color: #fff3d0;
+      border: 1px solid #d6aa5b;
+      border-radius: 5px;
+      padding: 7px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #reset-collected {
+      width: 100%;
+      margin-bottom: 10px;
+      background: #5f7f2a;
+    }
+
+    .plant-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      cursor: pointer;
+    }
+
+    .plant-option:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    .plant-option img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    .plant-option input {
+      transform: scale(1.15);
+    }
+
+    .plant-option span {
+      font-size: 14px;
+    }
+
+    .plant-option.disabled {
+      opacity: 0.45;
+    }
+
+    .plant-popup h1 {
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+
+    .plant-popup button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 8px;
+      border: none;
+      border-radius: 5px;
+      background: #5f7f2a;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .plant-popup button:hover {
+      background: #739b31;
+    }
+  </style>
 </head>
 
 <body>
+  <div id="plants-panel">
+    <h2>Рослини</h2>
+
+    <button id="reset-collected">Оновити збір рослин</button>
+
+    <div class="plants-actions">
+      <button id="select-all-plants">Вибрати всі</button>
+      <button id="clear-all-plants">Сховати всі</button>
+    </div>
+
+    <div id="plants-list"></div>
+  </div>
+
   <div id="map"></div>
 
   <script>
-    var nocache = 1559;
+    var nocache = 1560;
   </script>
 
   <script src="assets/js/lib/bootstrap.min.js"></script>
@@ -33,13 +161,13 @@
     module.exports(L);
   </script>
 
-  <script src="assets/js/loader.js?v=1559"></script>
-  <script src="assets/js/layers.js?v=1559"></script>
-  <script src="assets/js/settings.js?v=1559"></script>
-  <script src="assets/js/marker.js?v=1559"></script>
-  <script src="assets/js/map.js?v=1559"></script>
-  <script src="assets/js/language.js?v=1559"></script>
-  <script src="assets/js/plants.js?v=1559"></script>
-  <script src="assets/js/scripts.js?v=1559"></script>
+  <script src="assets/js/loader.js?v=1560"></script>
+  <script src="assets/js/layers.js?v=1560"></script>
+  <script src="assets/js/settings.js?v=1560"></script>
+  <script src="assets/js/marker.js?v=1560"></script>
+  <script src="assets/js/map.js?v=1560"></script>
+  <script src="assets/js/language.js?v=1560"></script>
+  <script src="assets/js/plants.js?v=1560"></script>
+  <script src="assets/js/scripts.js?v=1560"></script>
 </body>
 </html>
