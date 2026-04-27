@@ -1,16 +1,20 @@
-Object.defineProperty(Date.prototype, 'toISOUTCDateString', {
-  value: function () {
-    return this.toISOString().split('T')[0];
-  },
-});
+if (!Date.prototype.toISOUTCDateString) {
+  Object.defineProperty(Date.prototype, 'toISOUTCDateString', {
+    value: function () {
+      return this.toISOString().split('T')[0];
+    },
+  });
+}
 
-Object.defineProperty(String.prototype, 'filename', {
-  value: function (extension) {
-    let s = this.replace(/\\/g, '/');
-    s = s.substring(s.lastIndexOf('/') + 1);
-    return extension ? s.replace(/[?#].+$/, '') : s.split('.')[0];
-  },
-});
+if (!String.prototype.filename) {
+  Object.defineProperty(String.prototype, 'filename', {
+    value: function (extension) {
+      let s = this.replace(/\\/g, '/');
+      s = s.substring(s.lastIndexOf('/') + 1);
+      return extension ? s.replace(/[?#].+$/, '') : s.split('.')[0];
+    },
+  });
+}
 
 function getParameterByName(name, url) {
   if (!url) url = window.location.href;
@@ -34,10 +38,6 @@ function changeCursor() {
   if (map) map.style.cursor = 'grab';
 }
 
-/*
-  Заглушки, щоб map.js не ламався,
-  якщо ми прибираємо зайві розділи.
-*/
 const Discoverable = {
   updateLayers() {},
   onSettingsChanged() {},
@@ -58,6 +58,11 @@ const Menu = {
   reorderMenu() {},
   updateTippy() {},
   updateRangeTippy() {},
+  updateFancySelect() {},
+};
+
+const FME = {
+  update() {},
 };
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -91,13 +96,11 @@ function init() {
   Language.init()
     .then(() => {
       changeCursor();
-
       return PlantsCollection.init();
     })
     .then(() => {
       Loader.resolveMapModelLoaded();
       window.loaded = true;
-
       console.info('%c[Clean Map] Only plants loaded', 'color: #bada55; background: #242424');
     });
 }
