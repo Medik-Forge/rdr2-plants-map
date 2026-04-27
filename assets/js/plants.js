@@ -29,7 +29,6 @@ const UKRAINIAN_PLANT_NAMES = {
   wild_mint: 'Дика м’ята',
   wintergreen_berry: 'Ягода грушанки',
   yarrow: 'Деревій',
-  harrietum: 'Гаррієтум',
 
   berlandiera: 'Берландієра',
   harrietum_officinalis: 'Гаріетум лікарський',
@@ -47,9 +46,7 @@ const UKRAINIAN_PLANT_NAMES = {
   blue_lady_orchid: 'Орхідея «Блакитна леді»',
   rat_tail_orchid: 'Орхідея «Пацючий хвіст»',
   sparrows_egg_orchid: 'Орхідея «Яйце горобця»',
-  spider_orchid: 'Орхідея павук',
-  queen_orchid: 'Орхідея «Королева»',
-  moccasin_flower_orchid: 'Орхідея «Мокасинова квітка»'
+  spider_orchid: 'Орхідея павук'
 };
 
 const EXTRA_PLANTS = [
@@ -69,9 +66,7 @@ const EXTRA_PLANTS = [
   'blue_lady_orchid',
   'rat_tail_orchid',
   'sparrows_egg_orchid',
-  'spider_orchid',
-  'queen_orchid',
-  'moccasin_flower_orchid'
+  'spider_orchid'
 ];
 
 const MEDIC_RECIPES = [
@@ -311,6 +306,10 @@ class PlantsCollection {
       });
 
       data.forEach((item) => {
+        if (item.key === 'harrietum') {
+          item.key = 'harrietum_officinalis';
+        }
+
         this.locations.push(new Plants(item));
         this.quickParams.push(item.key);
       });
