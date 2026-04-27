@@ -45,7 +45,7 @@ const UKRAINIAN_PLANT_NAMES = {
   night_scented_orchid: 'Орхідея «Аромат ночі»',
   blue_lady_orchid: 'Орхідея «Блакитна леді»',
   rat_tail_orchid: 'Орхідея «Пацючий хвіст»',
-  sparrows_egg_orchid: 'Орхідея «Яйце горобця»',
+  sparrows_egg_orchid: 'Орхідея «Черевичок горобця»',
   spider_orchid: 'Орхідея павук'
 };
 
