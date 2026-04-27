@@ -29,8 +29,87 @@ const UKRAINIAN_PLANT_NAMES = {
   wild_mint: 'Дика м’ята',
   wintergreen_berry: 'Ягода грушанки',
   yarrow: 'Деревій',
-  harrietum: 'Гаррієтум'
+  harrietum: 'Гаррієтум',
+
+  berlandiera: 'Берландієра',
+  harrietum_officinalis: 'Гаріетум лікарський',
+  ghost_orchid: 'Орхідея-привид',
+  night_scented_orchid: 'Орхідея «Леді ночі»',
+  lady_slipper_orchid: 'Орхідея «Черевичок зозулі»',
+  yellow_lady_slipper_orchid: 'Орхідея «Жовтий черевичок»',
+  acuna_star_orchid: 'Орхідея «Зірка Акуні»',
+  cigar_orchid: 'Орхідея-сигара',
+  clamshell_orchid: 'Орхідея-ракушка',
+  dragon_mouth_orchid: 'Орхідея «Щелепи Дракона»',
+  queen_orchid: 'Орхідея «Королева»',
+  sparrows_egg_orchid: 'Орхідея «Черевичок горобця»',
+  spider_orchid: 'Орхідея павук',
+  rat_tail_orchid: 'Орхідея «Щурячий хвіст»',
+  moccasin_flower_orchid: 'Орхідея «Мокасинова квітка»'
 };
+
+const MEDIC_RECIPES = [
+  {
+    key: 'healing_tonic',
+    name: 'Тонік лікування',
+    plants: [
+      'berlandiera',
+      'harrietum_officinalis',
+      'ghost_orchid',
+      'night_scented_orchid',
+      'lady_slipper_orchid',
+      'yellow_lady_slipper_orchid'
+    ]
+  },
+  {
+    key: 'adrenaline_tonic',
+    name: 'Адреналіновий тонік',
+    plants: [
+      'burdock_root',
+      'milkweed',
+      'oleander_sage',
+      'acuna_star_orchid',
+      'cigar_orchid',
+      'clamshell_orchid',
+      'dragon_mouth_orchid'
+    ]
+  },
+  {
+    key: 'bandage',
+    name: 'Бинт',
+    plants: [
+      'milkweed',
+      'oleander_sage'
+    ]
+  },
+  {
+    key: 'burdock_decoction',
+    name: 'Відвар з лопуха',
+    plants: [
+      'burdock_root',
+      'common_bulrush'
+    ]
+  },
+  {
+    key: 'first_aid_kit',
+    name: 'Набір першої допомоги',
+    plants: [
+      'milkweed',
+      'oleander_sage'
+    ]
+  },
+  {
+    key: 'clear_mind_tincture',
+    name: 'Настоянка «Чистий Розум»',
+    plants: [
+      'night_scented_orchid',
+      'queen_orchid',
+      'rat_tail_orchid',
+      'sparrows_egg_orchid',
+      'spider_orchid'
+    ]
+  }
+];
 
 function getPlantName(key) {
   return UKRAINIAN_PLANT_NAMES[key] || key.replaceAll('_', ' ');
@@ -59,6 +138,7 @@ class Plants {
 
     this.element = document.createElement('label');
     this.element.className = 'plant-option disabled';
+    this.element.dataset.plantKey = this.key;
 
     this.element.innerHTML = `
       <input type="checkbox" data-plant-key="${this.key}">
@@ -70,6 +150,7 @@ class Plants {
 
     checkbox.addEventListener('change', () => {
       this.onMap = checkbox.checked;
+      PlantsCollection.saveSelectedPlants();
       PlantsCollection.layer.redraw();
     });
 
@@ -181,16 +262,20 @@ class PlantsCollection {
     this.markers = [];
     this.quickParams = [];
     this.locations = [];
+    this.activeRecipeKey = null;
 
     this.layer.addTo(MapBase.map);
 
     this.initControls();
+    this.createRecipesMenu();
 
     return Loader.promises['plants'].consumeJson((data) => {
       data.forEach((item) => {
         this.locations.push(new Plants(item));
         this.quickParams.push(item.key);
       });
+
+      this.restoreSelectedPlants();
 
       console.info('%c[Plants] Loaded all plants!', 'color: #bada55; background: #242424');
 
@@ -204,6 +289,7 @@ class PlantsCollection {
     const resetButton = document.getElementById('reset-collected');
     const selectAllButton = document.getElementById('select-all-plants');
     const clearAllButton = document.getElementById('clear-all-plants');
+    const searchInput = document.getElementById('plants-search');
 
     if (resetButton) {
       resetButton.addEventListener('click', () => {
@@ -219,15 +305,136 @@ class PlantsCollection {
 
     if (selectAllButton) {
       selectAllButton.addEventListener('click', () => {
+        PlantsCollection.activeRecipeKey = null;
+        PlantsCollection.updateRecipeButtons();
+        PlantsCollection.updateRecipePlantHighlights([]);
         PlantsCollection.setAllPlantsVisible(true);
+        PlantsCollection.saveSelectedPlants();
       });
     }
 
     if (clearAllButton) {
       clearAllButton.addEventListener('click', () => {
+        PlantsCollection.activeRecipeKey = null;
+        PlantsCollection.updateRecipeButtons();
+        PlantsCollection.updateRecipePlantHighlights([]);
         PlantsCollection.setAllPlantsVisible(false);
+        PlantsCollection.saveSelectedPlants();
       });
     }
+
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        PlantsCollection.applySearch(searchInput.value);
+      });
+    }
+  }
+
+  static createRecipesMenu() {
+    const recipesList = document.getElementById('recipes-list');
+    if (!recipesList) return;
+
+    recipesList.innerHTML = '';
+
+    MEDIC_RECIPES.forEach((recipe) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'recipe-option';
+      button.dataset.recipeKey = recipe.key;
+      button.textContent = recipe.name;
+
+      button.addEventListener('click', () => {
+        const isSameRecipe = PlantsCollection.activeRecipeKey === recipe.key;
+
+        if (isSameRecipe) {
+          PlantsCollection.activeRecipeKey = null;
+          PlantsCollection.updateRecipeButtons();
+          PlantsCollection.updateRecipePlantHighlights([]);
+          PlantsCollection.setAllPlantsVisible(false);
+          PlantsCollection.saveSelectedPlants();
+          return;
+        }
+
+        PlantsCollection.activeRecipeKey = recipe.key;
+        PlantsCollection.showRecipePlants(recipe);
+      });
+
+      recipesList.appendChild(button);
+    });
+  }
+
+  static showRecipePlants(recipe) {
+    const recipePlantKeys = recipe.plants;
+
+    this.markers = [];
+    this.enabledCategories = [];
+
+    this.locations.forEach((plant) => {
+      const shouldShow = recipePlantKeys.includes(plant.key);
+
+      plant.visible = shouldShow;
+
+      if (plant.element) {
+        plant.element.classList.toggle('disabled', !shouldShow);
+
+        const checkbox = plant.element.querySelector('input');
+        if (checkbox) checkbox.checked = shouldShow;
+      }
+
+      if (shouldShow) {
+        this.markers = this.markers.concat(plant.markers);
+        this.enabledCategories.push(plant.key);
+      }
+    });
+
+    this.layer.clearLayers();
+
+    if (this.markers.length > 0) {
+      this.layer.addLayers(this.markers);
+    }
+
+    this.updateRecipeButtons();
+    this.updateRecipePlantHighlights(recipePlantKeys);
+    this.saveSelectedPlants();
+
+    setTimeout(() => {
+      PlantsCollection.layer.redraw();
+    }, 40);
+  }
+
+  static updateRecipeButtons() {
+    const buttons = document.querySelectorAll('.recipe-option');
+
+    buttons.forEach((button) => {
+      button.classList.toggle(
+        'active',
+        button.dataset.recipeKey === PlantsCollection.activeRecipeKey
+      );
+    });
+  }
+
+  static updateRecipePlantHighlights(plantKeys) {
+    this.locations.forEach((plant) => {
+      if (!plant.element) return;
+      plant.element.classList.toggle('recipe-needed', plantKeys.includes(plant.key));
+    });
+  }
+
+  static applySearch(value) {
+    const query = value.trim().toLowerCase();
+
+    this.locations.forEach((plant) => {
+      if (!plant.element) return;
+
+      const plantName = getPlantName(plant.key).toLowerCase();
+      const plantKey = plant.key.toLowerCase();
+
+      const isVisibleInSearch =
+        plantName.includes(query) ||
+        plantKey.includes(query);
+
+      plant.element.style.display = isVisibleInSearch ? '' : 'none';
+    });
   }
 
   static setAllPlantsVisible(state) {
@@ -259,6 +466,58 @@ class PlantsCollection {
     setTimeout(() => {
       PlantsCollection.layer.redraw();
     }, 40);
+  }
+
+  static saveSelectedPlants() {
+    const selectedPlantKeys = this.locations
+      .filter((plant) => plant.visible)
+      .map((plant) => plant.key);
+
+    localStorage.setItem('rdo_selected_plants', JSON.stringify(selectedPlantKeys));
+  }
+
+  static restoreSelectedPlants() {
+    const saved = localStorage.getItem('rdo_selected_plants');
+
+    if (!saved) {
+      this.setAllPlantsVisible(false);
+      return;
+    }
+
+    let selectedPlantKeys = [];
+
+    try {
+      selectedPlantKeys = JSON.parse(saved);
+    } catch (error) {
+      selectedPlantKeys = [];
+    }
+
+    this.markers = [];
+    this.enabledCategories = [];
+
+    this.locations.forEach((plant) => {
+      const shouldShow = selectedPlantKeys.includes(plant.key);
+
+      plant.visible = shouldShow;
+
+      if (plant.element) {
+        plant.element.classList.toggle('disabled', !shouldShow);
+
+        const checkbox = plant.element.querySelector('input');
+        if (checkbox) checkbox.checked = shouldShow;
+      }
+
+      if (shouldShow) {
+        this.markers = this.markers.concat(plant.markers);
+        this.enabledCategories.push(plant.key);
+      }
+    });
+
+    this.layer.clearLayers();
+
+    if (this.markers.length > 0) {
+      this.layer.addLayers(this.markers);
+    }
   }
 
   static set onMap(state) {
