@@ -14,7 +14,7 @@ const UKRAINIAN_PLANT_NAMES = {
   golden_currant: 'Золота смородина',
   hummingbird_sage: 'Шавлія колібрі',
   indian_tobacco: 'Індіанський тютюн',
-  milkweed: 'Молочай',
+  milkweed: 'Ваточник',
   oleander_sage: 'Олеандрова шавлія',
   oregano: 'Орегано',
   parasol_mushroom: 'Гриб-парасолька',
@@ -33,20 +33,46 @@ const UKRAINIAN_PLANT_NAMES = {
 
   berlandiera: 'Берландієра',
   harrietum_officinalis: 'Гаріетум лікарський',
+  purple_lobelia: 'Лобелія пурпурова',
+
   ghost_orchid: 'Орхідея-привид',
-  night_scented_orchid: 'Орхідея «Леді ночі»',
+  lady_of_the_night_orchid: 'Орхідея «Леді ночі»',
   lady_slipper_orchid: 'Орхідея «Черевичок зозулі»',
   yellow_lady_slipper_orchid: 'Орхідея «Жовтий черевичок»',
   acuna_star_orchid: 'Орхідея «Зірка Акуні»',
   cigar_orchid: 'Орхідея-сигара',
   clamshell_orchid: 'Орхідея-ракушка',
   dragon_mouth_orchid: 'Орхідея «Щелепи Дракона»',
-  queen_orchid: 'Орхідея «Королева»',
-  sparrows_egg_orchid: 'Орхідея «Черевичок горобця»',
+  night_scented_orchid: 'Орхідея «Аромат ночі»',
+  blue_lady_orchid: 'Орхідея «Блакитна леді»',
+  rat_tail_orchid: 'Орхідея «Пацючий хвіст»',
+  sparrows_egg_orchid: 'Орхідея «Яйце горобця»',
   spider_orchid: 'Орхідея павук',
-  rat_tail_orchid: 'Орхідея «Щурячий хвіст»',
+  queen_orchid: 'Орхідея «Королева»',
   moccasin_flower_orchid: 'Орхідея «Мокасинова квітка»'
 };
+
+const EXTRA_PLANTS = [
+  'berlandiera',
+  'harrietum_officinalis',
+  'purple_lobelia',
+
+  'ghost_orchid',
+  'lady_of_the_night_orchid',
+  'lady_slipper_orchid',
+  'yellow_lady_slipper_orchid',
+  'acuna_star_orchid',
+  'cigar_orchid',
+  'clamshell_orchid',
+  'dragon_mouth_orchid',
+  'night_scented_orchid',
+  'blue_lady_orchid',
+  'rat_tail_orchid',
+  'sparrows_egg_orchid',
+  'spider_orchid',
+  'queen_orchid',
+  'moccasin_flower_orchid'
+];
 
 const MEDIC_RECIPES = [
   {
@@ -56,7 +82,7 @@ const MEDIC_RECIPES = [
       'berlandiera',
       'harrietum_officinalis',
       'ghost_orchid',
-      'night_scented_orchid',
+      'lady_of_the_night_orchid',
       'lady_slipper_orchid',
       'yellow_lady_slipper_orchid'
     ]
@@ -65,9 +91,8 @@ const MEDIC_RECIPES = [
     key: 'adrenaline_tonic',
     name: 'Адреналіновий тонік',
     plants: [
-      'burdock_root',
       'milkweed',
-      'oleander_sage',
+      'purple_lobelia',
       'acuna_star_orchid',
       'cigar_orchid',
       'clamshell_orchid',
@@ -87,7 +112,7 @@ const MEDIC_RECIPES = [
     name: 'Відвар з лопуха',
     plants: [
       'burdock_root',
-      'common_bulrush'
+      'creeping_thyme'
     ]
   },
   {
@@ -103,7 +128,7 @@ const MEDIC_RECIPES = [
     name: 'Настоянка «Чистий Розум»',
     plants: [
       'night_scented_orchid',
-      'queen_orchid',
+      'blue_lady_orchid',
       'rat_tail_orchid',
       'sparrows_egg_orchid',
       'spider_orchid'
@@ -122,6 +147,10 @@ function getCollectedKey(plantKey, markerIndex) {
 class Plants {
   constructor(preliminary) {
     Object.assign(this, preliminary);
+
+    if (!this.locations) {
+      this.locations = [];
+    }
 
     this.markers = [];
     this.visible = false;
@@ -142,7 +171,7 @@ class Plants {
 
     this.element.innerHTML = `
       <input type="checkbox" data-plant-key="${this.key}">
-      <img src="./assets/images/icons/game/${this.key}.png" alt="">
+      <img src="./assets/images/icons/game/${this.key}.png" alt="" onerror="this.style.visibility='hidden'">
       <span>${getPlantName(this.key)}</span>
     `;
 
@@ -270,6 +299,17 @@ class PlantsCollection {
     this.createRecipesMenu();
 
     return Loader.promises['plants'].consumeJson((data) => {
+      const existingKeys = data.map((item) => item.key);
+
+      EXTRA_PLANTS.forEach((key) => {
+        if (!existingKeys.includes(key)) {
+          data.push({
+            key: key,
+            locations: []
+          });
+        }
+      });
+
       data.forEach((item) => {
         this.locations.push(new Plants(item));
         this.quickParams.push(item.key);
