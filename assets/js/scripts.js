@@ -70,14 +70,30 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
-function init() {
+function addCleanSettings() {
   SettingProxy.addSetting(Settings, 'language', { default: 'en' });
 
+  SettingProxy.addSetting(Settings, 'baseLayer', { default: 'map.layers.default' });
   SettingProxy.addSetting(Settings, 'zoomSnap', { default: 0 });
+  SettingProxy.addSetting(Settings, 'zoomDelta', { default: 0.5 });
+  SettingProxy.addSetting(Settings, 'wheelDebounceTime', { default: 150 });
+  SettingProxy.addSetting(Settings, 'wheelPxPerZoomLevel', { default: 70 });
+
   SettingProxy.addSetting(Settings, 'markerSize', { default: 1 });
   SettingProxy.addSetting(Settings, 'markerOpacity', { default: 1 });
   SettingProxy.addSetting(Settings, 'isShadowsEnabled', { default: true });
   SettingProxy.addSetting(Settings, 'isDebugEnabled', { default: false });
+
+  SettingProxy.addSetting(Settings, 'isPopupsHoverEnabled', { default: false });
+  SettingProxy.addSetting(Settings, 'isDoubleClickZoomEnabled', { default: true });
+  SettingProxy.addSetting(Settings, 'overlayOpacity', { default: 0.5 });
+  SettingProxy.addSetting(Settings, 'isCoordsOnClickEnabled', { default: false });
+  SettingProxy.addSetting(Settings, 'isPinsPlacingEnabled', { default: false });
+  SettingProxy.addSetting(Settings, 'showTooltipsMap', { default: false });
+}
+
+function init() {
+  addCleanSettings();
 
   MapBase.init();
 
