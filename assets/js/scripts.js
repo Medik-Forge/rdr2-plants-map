@@ -34,11 +34,42 @@ function changeCursor() {
   if (map) map.style.cursor = 'grab';
 }
 
-const Discoverable = { updateLayers() {}, onSettingsChanged() {} };
-const Overlay = { onSettingsChanged() {} };
-const Legendary = { quickParams: [], animals: [], onSettingsChanged() {} };
-const Menu = { init() {}, reorderMenu() {}, updateTippy() {}, updateRangeTippy() {}, updateFancySelect() {} };
-const FME = { update() {} };
+function safeAddSetting(name, config) {
+  try {
+    SettingProxy.addSetting(Settings, name, config);
+  } catch (e) {
+    if (!String(e.message).includes('already registered')) {
+      throw e;
+    }
+  }
+}
+
+const Discoverable = {
+  updateLayers() {},
+  onSettingsChanged() {},
+};
+
+const Overlay = {
+  onSettingsChanged() {},
+};
+
+const Legendary = {
+  quickParams: [],
+  animals: [],
+  onSettingsChanged() {},
+};
+
+const Menu = {
+  init() {},
+  reorderMenu() {},
+  updateTippy() {},
+  updateRangeTippy() {},
+  updateFancySelect() {},
+};
+
+const FME = {
+  update() {},
+};
 
 document.addEventListener('DOMContentLoaded', function () {
   try {
@@ -50,7 +81,12 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function init() {
-  SettingProxy.addSetting(Settings, 'language', { default: 'en' });
+  safeAddSetting('language', { default: 'en' });
+
+  safeAddSetting('zoomSnap', { default: 0 });
+  safeAddSetting('zoomDelta', { default: 0.5 });
+  safeAddSetting('wheelPxPerZoomLevel', { default: 70 });
+  safeAddSetting('wheelDebounceTime', { default: 150 });
 
   MapBase.init();
 
