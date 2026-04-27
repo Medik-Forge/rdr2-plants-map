@@ -34,7 +34,6 @@ function changeCursor() {
   if (map) map.style.cursor = 'grab';
 }
 
-// 🔥 заглушки щоб не падало
 const Discoverable = { updateLayers() {}, onSettingsChanged() {} };
 const Overlay = { onSettingsChanged() {} };
 const Legendary = { quickParams: [], animals: [], onSettingsChanged() {} };
@@ -51,7 +50,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function init() {
-  // ❗ тільки це залишаємо
   SettingProxy.addSetting(Settings, 'language', { default: 'en' });
 
   MapBase.init();
