@@ -73,7 +73,6 @@ document.addEventListener('DOMContentLoaded', function () {
 function addCleanSettings() {
   SettingProxy.addSetting(Settings, 'language', { default: 'en' });
 
-  SettingProxy.addSetting(Settings, 'baseLayer', { default: 'map.layers.default' });
   SettingProxy.addSetting(Settings, 'zoomSnap', { default: 0 });
   SettingProxy.addSetting(Settings, 'zoomDelta', { default: 0.5 });
   SettingProxy.addSetting(Settings, 'wheelDebounceTime', { default: 150 });
