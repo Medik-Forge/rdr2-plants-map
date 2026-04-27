@@ -34,32 +34,12 @@ function changeCursor() {
   if (map) map.style.cursor = 'grab';
 }
 
-const Discoverable = {
-  updateLayers() {},
-  onSettingsChanged() {},
-};
-
-const Overlay = {
-  onSettingsChanged() {},
-};
-
-const Legendary = {
-  quickParams: [],
-  animals: [],
-  onSettingsChanged() {},
-};
-
-const Menu = {
-  init() {},
-  reorderMenu() {},
-  updateTippy() {},
-  updateRangeTippy() {},
-  updateFancySelect() {},
-};
-
-const FME = {
-  update() {},
-};
+// 🔥 заглушки щоб не падало
+const Discoverable = { updateLayers() {}, onSettingsChanged() {} };
+const Overlay = { onSettingsChanged() {} };
+const Legendary = { quickParams: [], animals: [], onSettingsChanged() {} };
+const Menu = { init() {}, reorderMenu() {}, updateTippy() {}, updateRangeTippy() {}, updateFancySelect() {} };
+const FME = { update() {} };
 
 document.addEventListener('DOMContentLoaded', function () {
   try {
@@ -70,29 +50,9 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
-function addCleanSettings() {
-  SettingProxy.addSetting(Settings, 'language', { default: 'en' });
-
-  SettingProxy.addSetting(Settings, 'zoomSnap', { default: 0 });
-  SettingProxy.addSetting(Settings, 'zoomDelta', { default: 0.5 });
-  SettingProxy.addSetting(Settings, 'wheelDebounceTime', { default: 150 });
-  SettingProxy.addSetting(Settings, 'wheelPxPerZoomLevel', { default: 70 });
-
-  SettingProxy.addSetting(Settings, 'markerSize', { default: 1 });
-  SettingProxy.addSetting(Settings, 'markerOpacity', { default: 1 });
-  SettingProxy.addSetting(Settings, 'isShadowsEnabled', { default: true });
-  SettingProxy.addSetting(Settings, 'isDebugEnabled', { default: false });
-
-  SettingProxy.addSetting(Settings, 'isPopupsHoverEnabled', { default: false });
-  SettingProxy.addSetting(Settings, 'isDoubleClickZoomEnabled', { default: true });
-  SettingProxy.addSetting(Settings, 'overlayOpacity', { default: 0.5 });
-  SettingProxy.addSetting(Settings, 'isCoordsOnClickEnabled', { default: false });
-  SettingProxy.addSetting(Settings, 'isPinsPlacingEnabled', { default: false });
-  SettingProxy.addSetting(Settings, 'showTooltipsMap', { default: false });
-}
-
 function init() {
-  addCleanSettings();
+  // ❗ тільки це залишаємо
+  SettingProxy.addSetting(Settings, 'language', { default: 'en' });
 
   MapBase.init();
 
