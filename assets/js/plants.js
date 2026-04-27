@@ -52,8 +52,6 @@ const UKRAINIAN_PLANT_NAMES = {
 const EXTRA_PLANTS = [
   'berlandiera',
   'harrietum_officinalis',
-  'purple_lobelia',
-
   'ghost_orchid',
   'lady_of_the_night_orchid',
   'lady_slipper_orchid',
