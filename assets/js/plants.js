@@ -1,37 +1,80 @@
+const UKRAINIAN_PLANT_NAMES = {
+  alaskan_ginseng: 'Аляскинський женьшень',
+  american_ginseng: 'Американський женьшень',
+  bay_bolete: 'Польський гриб',
+  black_berry: 'Ожина',
+  black_currant: 'Чорна смородина',
+  burdock_root: 'Корінь лопуха',
+  chanterelles: 'Лисички',
+  common_bulrush: 'Очерет звичайний',
+  creeping_thyme: 'Чебрець повзучий',
+  desert_sage: 'Пустельна шавлія',
+  english_mace: 'Англійська булава',
+  evergreen_huckleberry: 'Вічнозелена чорниця',
+  golden_currant: 'Золота смородина',
+  hummingbird_sage: 'Шавлія колібрі',
+  indian_tobacco: 'Індіанський тютюн',
+  milkweed: 'Молочай',
+  oleander_sage: 'Олеандрова шавлія',
+  oregano: 'Орегано',
+  parasol_mushroom: 'Гриб-парасолька',
+  prairie_poppy: 'Прерійний мак',
+  rams_head: 'Бараняча голова',
+  red_raspberry: 'Червона малина',
+  red_sage: 'Червона шавлія',
+  vanilla_flower: 'Ванільна квітка',
+  violet_snowdrop: 'Фіолетовий підсніжник',
+  wild_carrots: 'Дика морква',
+  wild_feverfew: 'Дика ромашка',
+  wild_mint: 'Дика м’ята',
+  wintergreen_berry: 'Ягода грушанки',
+  yarrow: 'Деревій',
+  harrietum: 'Гаррієтум'
+};
+
+function getPlantName(key) {
+  return UKRAINIAN_PLANT_NAMES[key] || key.replaceAll('_', ' ');
+}
+
+function getCollectedKey(plantKey, markerIndex) {
+  return `rdo_collected_plant_${plantKey}_${markerIndex}`;
+}
+
 class Plants {
   constructor(preliminary) {
     Object.assign(this, preliminary);
 
-    this.element = document.createElement('div');
-    this.element.className = 'collectible-wrapper';
+    this.markers = [];
+    this.visible = true;
 
-    Object.assign(this.element.dataset, {
-      help: 'item',
-      type: this.key,
-      tippyContent: Language.get(`map.plants.${this.key}.name`),
-    });
-
-    this.element.innerHTML = `
-      <img class="collectible-icon" src="./assets/images/icons/game/${this.key}.png">
-      <span class="collectible-text">
-        <p class="collectible" data-text="map.plants.${this.key}.name"></p>
-      </span>
-    `;
-
-    this.element.addEventListener('click', () => {
-      this.onMap = !this.onMap;
-      setTimeout(() => PlantsCollection.layer.redraw(), 40);
-    });
-
-    Language.translateDom(this.element);
-
-    if (PlantsCollection.context) {
-      PlantsCollection.context.appendChild(this.element);
-    }
-
+    this.createMenuItem();
     this.reinitMarker();
 
     this.onMap = true;
+  }
+
+  createMenuItem() {
+    const list = document.getElementById('plants-list');
+    if (!list) return;
+
+    this.element = document.createElement('label');
+    this.element.className = 'plant-option';
+
+    this.element.innerHTML = `
+      <input type="checkbox" checked data-plant-key="${this.key}">
+      <img src="./assets/images/icons/game/${this.key}.png" alt="">
+      <span>${getPlantName(this.key)}</span>
+    `;
+
+    const checkbox = this.element.querySelector('input');
+
+    checkbox.addEventListener('change', () => {
+      this.visible = checkbox.checked;
+      this.onMap = checkbox.checked;
+      PlantsCollection.layer.redraw();
+    });
+
+    list.appendChild(this.element);
   }
 
   reinitMarker() {
@@ -39,7 +82,13 @@ class Plants {
 
     const markerSize = Settings.markerSize || 1;
 
-    this.locations.forEach((_marker) => {
+    this.locations.forEach((_marker, index) => {
+      const collectedKey = getCollectedKey(this.key, index);
+
+      if (localStorage.getItem(collectedKey) === '1') {
+        return;
+      }
+
       const tempMarker = L.marker([_marker.x, _marker.y], {
         opacity: Settings.markerOpacity || 1,
         icon: L.divIcon({
@@ -53,37 +102,35 @@ class Plants {
         }),
       });
 
-      tempMarker.bindPopup(this.popupContent.bind(this, _marker), {
-        minWidth: 300,
-        maxWidth: 400,
+      tempMarker.plantKey = this.key;
+      tempMarker.markerIndex = index;
+
+      tempMarker.bindPopup(this.popupContent.bind(this, _marker, index), {
+        minWidth: 260,
+        maxWidth: 360,
       });
 
       this.markers.push(tempMarker);
     });
   }
 
-  popupContent(_marker) {
-    const plantName = Language.get(`map.plants.${this.key}.name`);
-
-    const description = Language.get('map.plants.desc').replace(
-      /{plant}/,
-      plantName.toLowerCase()
-    );
-
+  popupContent(_marker, index) {
+    const plantName = getPlantName(this.key);
     const popup = document.createElement('div');
+
+    popup.className = 'plant-popup';
 
     popup.innerHTML = `
       <h1>${plantName}</h1>
-      <span class="marker-content-wrapper">
-        <p>${description}</p>
-      </span>
-      <button class="btn btn-info remove-button full-popup-width">Remove</button>
+      <p>Познач цю рослину як зібрану. Вона зникне з карти до оновлення збору.</p>
+      <button type="button">Зібрано</button>
       <small>Latitude: ${_marker.x} / Longitude: ${_marker.y}</small>
     `;
 
-    const button = popup.querySelector('button');
-    button.addEventListener('click', () => {
-      this.onMap = false;
+    popup.querySelector('button').addEventListener('click', () => {
+      localStorage.setItem(getCollectedKey(this.key, index), '1');
+      PlantsCollection.refresh();
+      MapBase.map.closePopup();
     });
 
     if (!Settings.isDebugEnabled) {
@@ -94,48 +141,36 @@ class Plants {
   }
 
   set onMap(state) {
+    this.visible = state;
+
+    PlantsCollection.markers = PlantsCollection.markers.filter(
+      marker => marker.plantKey !== this.key
+    );
+
+    PlantsCollection.enabledCategories = PlantsCollection.enabledCategories.filter(
+      key => key !== this.key
+    );
+
     if (state) {
-      if (!PlantsCollection.enabledCategories.includes(this.key)) {
-        PlantsCollection.markers = PlantsCollection.markers.concat(this.markers);
-        PlantsCollection.enabledCategories.push(this.key);
-      }
+      PlantsCollection.markers = PlantsCollection.markers.concat(this.markers);
+      PlantsCollection.enabledCategories.push(this.key);
+    }
 
-      PlantsCollection.layer.clearLayers();
+    PlantsCollection.layer.clearLayers();
 
-      if (PlantsCollection.markers.length > 0) {
-        PlantsCollection.layer.addLayers(PlantsCollection.markers);
-      }
+    if (PlantsCollection.markers.length > 0) {
+      PlantsCollection.layer.addLayers(PlantsCollection.markers);
+    }
 
-      if (this.element && this.element.parentElement) {
-        this.element.querySelector('span').classList.remove('disabled');
-      }
-    } else {
-      PlantsCollection.markers = PlantsCollection.markers.filter(
-        (el) => !this.markers.includes(el)
-      );
-
-      PlantsCollection.enabledCategories = PlantsCollection.enabledCategories.filter(
-        (el) => el !== this.key
-      );
-
-      PlantsCollection.layer.clearLayers();
-
-      if (PlantsCollection.markers.length > 0) {
-        PlantsCollection.layer.addLayers(PlantsCollection.markers);
-      }
-
-      if (this.element && this.element.parentElement) {
-        this.element.querySelector('span').classList.add('disabled');
-      }
-
-      if (MapBase.map) {
-        MapBase.map.closePopup();
-      }
+    if (this.element) {
+      this.element.classList.toggle('disabled', !state);
+      const checkbox = this.element.querySelector('input');
+      if (checkbox) checkbox.checked = state;
     }
   }
 
   get onMap() {
-    return true;
+    return this.visible;
   }
 }
 
@@ -147,9 +182,9 @@ class PlantsCollection {
     this.quickParams = [];
     this.locations = [];
 
-    this.context = document.querySelector('.menu-hidden[data-type=plants]');
-
     this.layer.addTo(MapBase.map);
+
+    this.initControls();
 
     return Loader.promises['plants'].consumeJson((data) => {
       data.forEach((item) => {
@@ -165,21 +200,49 @@ class PlantsCollection {
     });
   }
 
+  static initControls() {
+    const resetButton = document.getElementById('reset-collected');
+    const selectAllButton = document.getElementById('select-all-plants');
+    const clearAllButton = document.getElementById('clear-all-plants');
+
+    if (resetButton) {
+      resetButton.addEventListener('click', () => {
+        Object.keys(localStorage).forEach((key) => {
+          if (key.startsWith('rdo_collected_plant_')) {
+            localStorage.removeItem(key);
+          }
+        });
+
+        PlantsCollection.refresh();
+      });
+    }
+
+    if (selectAllButton) {
+      selectAllButton.addEventListener('click', () => {
+        PlantsCollection.locations.forEach((plant) => {
+          plant.onMap = true;
+        });
+      });
+    }
+
+    if (clearAllButton) {
+      clearAllButton.addEventListener('click', () => {
+        PlantsCollection.locations.forEach((plant) => {
+          plant.onMap = false;
+        });
+      });
+    }
+  }
+
   static set onMap(state) {
     if (state) {
-      if (this.markers.length > 0) {
-        this.layer.addTo(MapBase.map);
-      }
+      this.layer.addTo(MapBase.map);
     } else {
       this.layer.remove();
     }
 
-    if (this.context) {
-      this.context.classList.toggle('disabled', !state);
-    }
-
-    PlantsCollection.locations.forEach((_plant) => {
-      _plant.onMap = state;
+    PlantsCollection.locations.forEach((plant) => {
+      plant.onMap = state;
     });
   }
 
@@ -198,8 +261,9 @@ class PlantsCollection {
     this.enabledCategories = [];
 
     this.locations.forEach((plant) => {
+      const wasVisible = plant.visible;
       plant.reinitMarker();
-      plant.onMap = true;
+      plant.onMap = wasVisible;
     });
 
     this.layer.clearLayers();
@@ -207,5 +271,9 @@ class PlantsCollection {
     if (this.markers.length > 0) {
       this.layer.addLayers(this.markers);
     }
+
+    setTimeout(() => {
+      PlantsCollection.layer.redraw();
+    }, 40);
   }
 }
