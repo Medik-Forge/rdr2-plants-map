@@ -105,3 +105,8 @@ function init() {
       alert('Map error. Check console.');
     });
 }
+document.addEventListener('DOMContentLoaded', () => {
+  MapBase.map.on('click', function (event) {
+    console.log(`{ "x": ${event.latlng.lat}, "y": ${event.latlng.lng} },`);
+  });
+});
