@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
   <title>RDO Plants Map</title>
   <meta charset="UTF-8">
@@ -47,28 +47,6 @@
       color: #ffd27a;
     }
 
-    #plants-search {
-      width: 100%;
-      box-sizing: border-box;
-      margin-bottom: 10px;
-      padding: 8px 10px;
-      background: rgba(15, 11, 8, 0.92);
-      border: 1px solid #b08a4a;
-      border-radius: 5px;
-      color: #f4e1b8;
-      outline: none;
-      font-size: 14px;
-    }
-
-    #plants-search::placeholder {
-      color: rgba(244, 225, 184, 0.62);
-    }
-
-    #plants-search:focus {
-      border-color: #ffd27a;
-      box-shadow: 0 0 0 2px rgba(255, 210, 122, 0.18);
-    }
-
     .plants-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -87,21 +65,10 @@
       font-weight: bold;
     }
 
-    .plants-actions button:hover,
-    #reset-collected:hover {
-      filter: brightness(1.12);
-    }
-
     #reset-collected {
       width: 100%;
       margin-bottom: 10px;
       background: #5f7f2a;
-    }
-
-    #plants-list {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
     }
 
     .plant-option {
@@ -109,11 +76,8 @@
       align-items: center;
       gap: 8px;
       padding: 6px;
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 5px;
-      background: rgba(255,255,255,0.035);
+      border-bottom: 1px solid rgba(255,255,255,0.12);
       cursor: pointer;
-      user-select: none;
     }
 
     .plant-option:hover {
@@ -124,32 +88,18 @@
       width: 28px;
       height: 28px;
       object-fit: contain;
-      flex: 0 0 auto;
     }
 
     .plant-option input {
       transform: scale(1.15);
-      flex: 0 0 auto;
     }
 
     .plant-option span {
       font-size: 14px;
-      line-height: 1.2;
     }
 
     .plant-option.disabled {
       opacity: 0.45;
-    }
-
-    .plant-map-marker {
-      background: transparent;
-      border: none;
-    }
-
-    .plant-map-marker-image {
-      display: block;
-      pointer-events: none;
-      transition: filter 0.15s ease, opacity 0.15s ease;
     }
 
     .plant-popup h1 {
@@ -178,8 +128,6 @@
 <body>
   <div id="plants-panel">
     <h2>Рослини</h2>
-
-    <input id="plants-search" type="text" placeholder="Пошук рослин...">
 
     <button id="reset-collected">Оновити збір рослин</button>
 
