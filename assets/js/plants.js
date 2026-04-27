@@ -69,7 +69,6 @@ class Plants {
     const checkbox = this.element.querySelector('input');
 
     checkbox.addEventListener('change', () => {
-      this.visible = checkbox.checked;
       this.onMap = checkbox.checked;
       PlantsCollection.layer.redraw();
     });
@@ -91,22 +90,14 @@ class Plants {
 
       const tempMarker = L.marker([_marker.x, _marker.y], {
         opacity: Settings.markerOpacity || 1,
-        icon: L.divIcon({
-          className: 'plant-map-marker',
-          html: `
-            <img
-              src="assets/images/markers/${this.key}.png"
-              class="plant-map-marker-image"
-              style="
-                width: ${35 * markerSize}px;
-                height: ${45 * markerSize}px;
-              "
-              alt=""
-            >
-          `,
+        icon: L.icon({
+          iconUrl: `assets/images/markers/${this.key}.png`,
           iconSize: [35 * markerSize, 45 * markerSize],
           iconAnchor: [17 * markerSize, 42 * markerSize],
           popupAnchor: [0, -28 * markerSize],
+          shadowUrl: Settings.isShadowsEnabled ? 'assets/images/markers-shadow.png' : '',
+          shadowSize: [35 * markerSize, 16 * markerSize],
+          shadowAnchor: [10 * markerSize, 10 * markerSize],
         }),
       });
 
@@ -136,23 +127,9 @@ class Plants {
     `;
 
     popup.querySelector('button').addEventListener('click', () => {
-      const marker = this.markers.find((item) => item.markerIndex === index);
-
-      if (marker && marker._icon) {
-        const markerImage = marker._icon.querySelector('.plant-map-marker-image');
-
-        if (markerImage) {
-          markerImage.style.filter = 'grayscale(1)';
-          markerImage.style.opacity = '0.45';
-        }
-      }
-
       localStorage.setItem(getCollectedKey(this.key, index), '1');
-
-      setTimeout(() => {
-        PlantsCollection.refresh();
-        MapBase.map.closePopup();
-      }, 500);
+      PlantsCollection.refresh();
+      MapBase.map.closePopup();
     });
 
     if (!Settings.isDebugEnabled) {
@@ -227,7 +204,6 @@ class PlantsCollection {
     const resetButton = document.getElementById('reset-collected');
     const selectAllButton = document.getElementById('select-all-plants');
     const clearAllButton = document.getElementById('clear-all-plants');
-    const searchInput = document.getElementById('plants-search');
 
     if (resetButton) {
       resetButton.addEventListener('click', () => {
@@ -250,25 +226,6 @@ class PlantsCollection {
     if (clearAllButton) {
       clearAllButton.addEventListener('click', () => {
         PlantsCollection.setAllPlantsVisible(false);
-      });
-    }
-
-    if (searchInput) {
-      searchInput.addEventListener('input', () => {
-        const query = searchInput.value.trim().toLowerCase();
-
-        PlantsCollection.locations.forEach((plant) => {
-          if (!plant.element) return;
-
-          const plantName = getPlantName(plant.key).toLowerCase();
-          const plantKey = plant.key.toLowerCase();
-
-          const isVisibleInSearch =
-            plantName.includes(query) ||
-            plantKey.includes(query);
-
-          plant.element.style.display = isVisibleInSearch ? '' : 'none';
-        });
       });
     }
   }
@@ -332,7 +289,6 @@ class PlantsCollection {
       const wasVisible = plant.visible;
 
       plant.reinitMarker();
-
       plant.visible = wasVisible;
 
       if (wasVisible) {
