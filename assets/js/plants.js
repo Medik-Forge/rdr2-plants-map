@@ -46,6 +46,7 @@ const UKRAINIAN_PLANT_NAMES = {
   blue_lady_orchid: 'Орхідея «Блакитна леді»',
   rat_tail_orchid: 'Орхідея «Пацючий хвіст»',
   sparrows_egg_orchid: 'Орхідея «Черевичок горобця»',
+  vatochnik: 'Ваточник',
   spider_orchid: 'Орхідея павук'
 };
 
@@ -64,6 +65,7 @@ const EXTRA_PLANTS = [
   'blue_lady_orchid',
   'rat_tail_orchid',
   'sparrows_egg_orchid',
+  'vatochnik',
   'spider_orchid'
 ];
 
@@ -84,7 +86,7 @@ const MEDIC_RECIPES = [
     key: 'adrenaline_tonic',
     name: 'Адреналіновий тонік',
     plants: [
-      'milkweed',
+      'vatochnik',
       'purple_lobelia',
       'acuna_star_orchid',
       'cigar_orchid',
