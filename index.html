@@ -48,6 +48,41 @@
       font-weight: bold;
     }
 
+    #toggle-plants-panel,
+    #toggle-recipes {
+      width: 100%;
+      margin-bottom: 12px;
+      background: linear-gradient(180deg, #30251b, #17100b);
+      color: #ffd27a;
+      border: 1px solid rgba(214, 170, 91, 0.85);
+      border-radius: 9px;
+      padding: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    #plants-panel.panel-collapsed {
+      max-height: none;
+      overflow: hidden;
+    }
+
+    #plants-panel.panel-collapsed .panel-content {
+      display: none;
+    }
+
+    #plants-panel.panel-collapsed #toggle-plants-panel {
+      margin-bottom: 0;
+    }
+
+    #recipes-section {
+      display: none;
+    }
+
+    #recipes-section.open {
+      display: block;
+    }
+
     .panel-section-title {
       margin: 14px 0 8px;
       padding-bottom: 6px;
@@ -105,7 +140,9 @@
 
     .plants-actions button:hover,
     #reset-collected:hover,
-    .recipe-option:hover {
+    .recipe-option:hover,
+    #toggle-plants-panel:hover,
+    #toggle-recipes:hover {
       filter: brightness(1.15);
     }
 
@@ -207,6 +244,58 @@
     .plant-popup button:hover {
       background: #739b31;
     }
+
+    @media (max-width: 768px) {
+      #plants-panel {
+        width: calc(100vw - 24px);
+        left: 12px;
+        right: 12px;
+        top: 12px;
+        max-height: calc(100vh - 24px);
+        padding: 12px;
+      }
+
+      #plants-panel h2 {
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+
+      #plants-search {
+        font-size: 16px;
+        padding: 12px;
+      }
+
+      #reset-collected,
+      #toggle-plants-panel,
+      #toggle-recipes {
+        font-size: 16px;
+        padding: 12px;
+      }
+
+      .plants-actions button {
+        font-size: 16px;
+        padding: 12px 8px;
+      }
+
+      .recipe-option {
+        font-size: 16px;
+        padding: 12px;
+      }
+
+      .plant-option {
+        padding: 9px;
+        gap: 8px;
+      }
+
+      .plant-option img {
+        width: 32px;
+        height: 32px;
+      }
+
+      .plant-option span {
+        font-size: 16px;
+      }
+    }
   </style>
 </head>
 
@@ -214,20 +303,28 @@
   <div id="plants-panel">
     <h2>Рослини</h2>
 
-    <input id="plants-search" type="text" placeholder="Пошук рослин...">
+    <button id="toggle-plants-panel">Згорнути меню</button>
 
-    <button id="reset-collected">Оновити збір рослин</button>
+    <div class="panel-content">
+      <input id="plants-search" type="text" placeholder="Пошук рослин...">
 
-    <div class="plants-actions">
-      <button id="select-all-plants">Вибрати всі</button>
-      <button id="clear-all-plants">Сховати всі</button>
+      <button id="reset-collected">Оновити збір рослин</button>
+
+      <div class="plants-actions">
+        <button id="select-all-plants">Вибрати всі</button>
+        <button id="clear-all-plants">Сховати всі</button>
+      </div>
+
+      <button id="toggle-recipes">Розгорнути рецепти медика</button>
+
+      <div id="recipes-section">
+        <div class="panel-section-title">Рецепти медика</div>
+        <div id="recipes-list"></div>
+      </div>
+
+      <div class="panel-section-title">Усі рослини</div>
+      <div id="plants-list"></div>
     </div>
-
-    <div class="panel-section-title">Рецепти медика</div>
-    <div id="recipes-list"></div>
-
-    <div class="panel-section-title">Усі рослини</div>
-    <div id="plants-list"></div>
   </div>
 
   <div id="map"></div>
@@ -260,5 +357,30 @@
   <script src="assets/js/language.js?v=1560"></script>
   <script src="assets/js/plants.js?v=1560"></script>
   <script src="assets/js/scripts.js?v=1560"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const panel = document.getElementById('plants-panel');
+      const togglePanel = document.getElementById('toggle-plants-panel');
+      const recipesSection = document.getElementById('recipes-section');
+      const toggleRecipes = document.getElementById('toggle-recipes');
+
+      togglePanel.addEventListener('click', function () {
+        panel.classList.toggle('panel-collapsed');
+
+        togglePanel.textContent = panel.classList.contains('panel-collapsed')
+          ? 'Розгорнути меню'
+          : 'Згорнути меню';
+      });
+
+      toggleRecipes.addEventListener('click', function () {
+        recipesSection.classList.toggle('open');
+
+        toggleRecipes.textContent = recipesSection.classList.contains('open')
+          ? 'Згорнути рецепти медика'
+          : 'Розгорнути рецепти медика';
+      });
+    });
+  </script>
 </body>
 </html>
