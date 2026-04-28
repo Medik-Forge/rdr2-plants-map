@@ -2946,3 +2946,110 @@ button.reload-nazar {
   flex-direction: column;
   gap: 8px;
 }
+/* MOBILE FIX CUSTOM PLANT MENU */
+@media (max-width: 768px) {
+  .side-menu {
+    width: 92vw !important;
+    max-width: 92vw !important;
+    height: calc(100vh - 40px) !important;
+    top: -120vh;
+    left: 4vw !important;
+    right: 4vw !important;
+    margin-top: 20px;
+    border-radius: 14px;
+    background: rgba(15, 10, 5, 0.96) !important;
+    box-shadow: 0 0 25px rgba(0,0,0,.8);
+  }
+
+  .side-menu.menu-opened {
+    top: 20 !important;
+    left: 4vw !important;
+  }
+
+  .custom-plant-menu {
+    height: auto !important;
+    min-height: 100%;
+    padding: 14px !important;
+    background: transparent !important;
+  }
+
+  .custom-plant-title {
+    font-size: 26px !important;
+    margin-bottom: 14px !important;
+    padding: 8px !important;
+    border: none !important;
+    color: #f3c66b !important;
+  }
+
+  .input-search,
+  .custom-plant-search {
+    height: 48px !important;
+    font-size: 18px !important;
+    padding: 10px 14px !important;
+    border-radius: 8px !important;
+  }
+
+  .custom-plant-actions {
+    gap: 10px !important;
+    margin: 14px 0 !important;
+  }
+
+  .custom-plant-actions button,
+  .custom-plant-button,
+  .btn {
+    min-height: 52px !important;
+    font-size: 17px !important;
+    padding: 10px !important;
+    border-radius: 10px !important;
+  }
+
+  .custom-plant-section-title {
+    font-size: 18px !important;
+    text-align: left !important;
+    margin: 18px 0 10px !important;
+    color: #f3c66b !important;
+  }
+
+  .custom-plant-list {
+    gap: 10px !important;
+  }
+
+  .side-menu .collectible-wrapper {
+    min-height: 74px !important;
+    padding: 10px 12px !important;
+    border: 1px solid rgba(198, 137, 55, .45);
+    border-radius: 10px;
+    background: rgba(20, 12, 6, .75);
+  }
+
+  .side-menu .collectible-icon {
+    width: 42px !important;
+    height: 42px !important;
+    margin-top: 6px !important;
+    margin-right: 12px !important;
+  }
+
+  .side-menu .collectible-text {
+    font-size: 18px !important;
+    line-height: 42px !important;
+  }
+
+  .side-menu .collectible {
+    line-height: 42px !important;
+    white-space: normal !important;
+  }
+
+  .input-checkbox-wrapper {
+    min-width: 32px !important;
+    width: 32px !important;
+    height: 32px !important;
+    margin-top: 10px !important;
+  }
+
+  .menu-toggle {
+    width: 42px !important;
+    height: 42px !important;
+    left: 8px !important;
+    top: 8px !important;
+  }
+}
