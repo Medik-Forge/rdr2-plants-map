@@ -5,8 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- 🔽 FAVICON -->
-  <link rel="icon" type="image/png" sizes="32x32" href="./favicon.png">
+  <!-- 🔽 ДОДАНО FAVICON -->
+  <link rel="icon" type="image/png" href="./favicon.png">
 
   <link rel="stylesheet" href="assets/css/leaflet.css">
   <link rel="stylesheet" href="assets/css/bootstrap.min.css">
@@ -315,4 +315,84 @@
 </head>
 
 <body>
-  <!-- ТВОЙ КОД ДАЛІ БЕЗ ЗМІН -->
+  <div id="plants-panel">
+    <div class="panel-header">
+      <h2>Рослини</h2>
+      <button id="toggle-plants-panel" class="arrow-toggle">▲</button>
+    </div>
+
+    <div class="panel-content">
+      <input id="plants-search" type="text" placeholder="Пошук рослин...">
+
+      <button id="reset-collected">Оновити збір рослин</button>
+
+      <div class="plants-actions">
+        <button id="select-all-plants">Вибрати всі</button>
+        <button id="clear-all-plants">Сховати всі</button>
+      </div>
+
+      <div class="panel-section-title">
+        <span>Рецепти медика</span>
+        <button id="toggle-recipes" class="arrow-toggle">▼</button>
+      </div>
+
+      <div id="recipes-section">
+        <div id="recipes-list"></div>
+      </div>
+
+      <div class="panel-section-title">Усі рослини</div>
+      <div id="plants-list"></div>
+    </div>
+  </div>
+
+  <div id="map"></div>
+
+  <script>
+    var nocache = 1560;
+  </script>
+
+  <script src="assets/js/lib/bootstrap.min.js"></script>
+  <script src="assets/js/lib/leaflet.js"></script>
+  <script src="assets/js/lib/leaflet-zoomex.js"></script>
+  <script src="assets/js/lib/oms.min.js"></script>
+  <script src="assets/js/lib/rbush.js"></script>
+
+  <script>
+    var module = {};
+  </script>
+
+  <script src="assets/js/lib/leaflet.canvas-markers.js"></script>
+
+  <script>
+    module.exports(L);
+  </script>
+
+  <script src="assets/js/loader.js?v=1560"></script>
+  <script src="assets/js/layers.js?v=1560"></script>
+  <script src="assets/js/settings.js?v=1560"></script>
+  <script src="assets/js/marker.js?v=1560"></script>
+  <script src="assets/js/map.js?v=1560"></script>
+  <script src="assets/js/language.js?v=1560"></script>
+  <script src="assets/js/plants.js?v=1560"></script>
+  <script src="assets/js/scripts.js?v=1560"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const panel = document.getElementById('plants-panel');
+      const togglePanel = document.getElementById('toggle-plants-panel');
+      const recipesSection = document.getElementById('recipes-section');
+      const toggleRecipes = document.getElementById('toggle-recipes');
+
+      togglePanel.addEventListener('click', function () {
+        panel.classList.toggle('panel-collapsed');
+        togglePanel.textContent = panel.classList.contains('panel-collapsed') ? '▼' : '▲';
+      });
+
+      toggleRecipes.addEventListener('click', function () {
+        recipesSection.classList.toggle('open');
+        toggleRecipes.textContent = recipesSection.classList.contains('open') ? '▲' : '▼';
+      });
+    });
+  </script>
+</body>
+</html>
