@@ -50,16 +50,25 @@
 
     #toggle-plants-panel,
     #toggle-recipes {
-      width: 100%;
-      margin-bottom: 12px;
-      background: linear-gradient(180deg, #30251b, #17100b);
+      width: auto;
+      min-width: 28px;
+      height: 28px;
+      margin: 0 auto 12px;
+      display: block;
+      background: none;
       color: #ffd27a;
-      border: 1px solid rgba(214, 170, 91, 0.85);
-      border-radius: 9px;
-      padding: 10px;
+      border: none;
+      padding: 0;
       cursor: pointer;
       font-weight: bold;
-      font-size: 14px;
+      font-size: 20px;
+      line-height: 28px;
+      box-shadow: none;
+    }
+
+    #toggle-plants-panel.open,
+    #toggle-recipes.open {
+      transform: rotate(180deg);
     }
 
     #plants-panel.panel-collapsed {
@@ -265,11 +274,15 @@
         padding: 12px;
       }
 
-      #reset-collected,
-      #toggle-plants-panel,
-      #toggle-recipes {
+      #reset-collected {
         font-size: 16px;
         padding: 12px;
+      }
+
+      #toggle-plants-panel,
+      #toggle-recipes {
+        font-size: 22px;
+        padding: 0;
       }
 
       .plants-actions button {
@@ -303,7 +316,7 @@
   <div id="plants-panel">
     <h2>Рослини</h2>
 
-    <button id="toggle-plants-panel">Згорнути меню</button>
+    <button id="toggle-plants-panel">▼</button>
 
     <div class="panel-content">
       <input id="plants-search" type="text" placeholder="Пошук рослин...">
@@ -315,7 +328,7 @@
         <button id="clear-all-plants">Сховати всі</button>
       </div>
 
-      <button id="toggle-recipes">Розгорнути рецепти медика</button>
+      <button id="toggle-recipes">▼</button>
 
       <div id="recipes-section">
         <div class="panel-section-title">Рецепти медика</div>
@@ -367,18 +380,12 @@
 
       togglePanel.addEventListener('click', function () {
         panel.classList.toggle('panel-collapsed');
-
-        togglePanel.textContent = panel.classList.contains('panel-collapsed')
-          ? 'Розгорнути меню'
-          : 'Згорнути меню';
+        togglePanel.classList.toggle('open');
       });
 
       toggleRecipes.addEventListener('click', function () {
         recipesSection.classList.toggle('open');
-
-        toggleRecipes.textContent = recipesSection.classList.contains('open')
-          ? 'Згорнути рецепти медика'
-          : 'Розгорнути рецепти медика';
+        toggleRecipes.classList.toggle('open');
       });
     });
   </script>
