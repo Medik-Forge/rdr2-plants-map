@@ -40,34 +40,37 @@
       font-family: Arial, sans-serif;
     }
 
+    .panel-header {
+      position: relative;
+      margin-bottom: 14px;
+    }
+
     #plants-panel h2 {
-      margin: 0 0 14px;
+      margin: 0;
       font-size: 25px;
       text-align: center;
       color: #ffd27a;
       font-weight: bold;
     }
 
-    #toggle-plants-panel,
-    #toggle-recipes {
-      width: auto;
-      min-width: 28px;
-      height: 28px;
-      margin: 0 auto 12px;
-      display: block;
+    .arrow-toggle {
       background: none;
-      color: #ffd27a;
       border: none;
-      padding: 0;
+      color: #ffd27a;
       cursor: pointer;
       font-weight: bold;
-      font-size: 20px;
-      line-height: 28px;
-      box-shadow: none;
+      font-size: 22px;
+      line-height: 1;
+      padding: 0;
     }
 
-    #toggle-plants-panel.open,
-    #toggle-recipes.open {
+    #toggle-plants-panel {
+      position: absolute;
+      right: 48px;
+      top: 3px;
+    }
+
+    .arrow-toggle.open {
       transform: rotate(180deg);
     }
 
@@ -78,10 +81,6 @@
 
     #plants-panel.panel-collapsed .panel-content {
       display: none;
-    }
-
-    #plants-panel.panel-collapsed #toggle-plants-panel {
-      margin-bottom: 0;
     }
 
     #recipes-section {
@@ -101,6 +100,9 @@
       text-transform: uppercase;
       letter-spacing: 0.8px;
       font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     #plants-search {
@@ -150,8 +152,7 @@
     .plants-actions button:hover,
     #reset-collected:hover,
     .recipe-option:hover,
-    #toggle-plants-panel:hover,
-    #toggle-recipes:hover {
+    .arrow-toggle:hover {
       filter: brightness(1.15);
     }
 
@@ -266,7 +267,11 @@
 
       #plants-panel h2 {
         font-size: 24px;
-        margin-bottom: 10px;
+      }
+
+      #toggle-plants-panel {
+        right: 42px;
+        top: 2px;
       }
 
       #plants-search {
@@ -277,12 +282,6 @@
       #reset-collected {
         font-size: 16px;
         padding: 12px;
-      }
-
-      #toggle-plants-panel,
-      #toggle-recipes {
-        font-size: 22px;
-        padding: 0;
       }
 
       .plants-actions button {
@@ -314,9 +313,10 @@
 
 <body>
   <div id="plants-panel">
-    <h2>Рослини</h2>
-
-    <button id="toggle-plants-panel">▼</button>
+    <div class="panel-header">
+      <h2>Рослини</h2>
+      <button id="toggle-plants-panel" class="arrow-toggle">▲</button>
+    </div>
 
     <div class="panel-content">
       <input id="plants-search" type="text" placeholder="Пошук рослин...">
@@ -328,10 +328,12 @@
         <button id="clear-all-plants">Сховати всі</button>
       </div>
 
-      <button id="toggle-recipes">▼</button>
+      <div class="panel-section-title">
+        <span>Рецепти медика</span>
+        <button id="toggle-recipes" class="arrow-toggle">▼</button>
+      </div>
 
       <div id="recipes-section">
-        <div class="panel-section-title">Рецепти медика</div>
         <div id="recipes-list"></div>
       </div>
 
@@ -380,12 +382,12 @@
 
       togglePanel.addEventListener('click', function () {
         panel.classList.toggle('panel-collapsed');
-        togglePanel.classList.toggle('open');
+        togglePanel.textContent = panel.classList.contains('panel-collapsed') ? '▼' : '▲';
       });
 
       toggleRecipes.addEventListener('click', function () {
         recipesSection.classList.toggle('open');
-        toggleRecipes.classList.toggle('open');
+        toggleRecipes.textContent = recipesSection.classList.contains('open') ? '▲' : '▼';
       });
     });
   </script>
